@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const DataParser = require("./parser.js");
 const DBLogger = require("./dblogger.js");
+const Windrose = require("./windrose.js");
 
 const host = process.env.SENSOR_HOST;
 const port = parseInt(process.env.SENSOR_PORT);
@@ -13,8 +14,13 @@ const path = require('path');
 const app = express();
 const cors = require('cors');
 let sensorData = {};
+
 app.use(cors());
 
+app.use('/windrose', async (req, res) => {
+    let data = await Windrose.getData();
+    res.status(200).send(JSON.stringify(data, null, 2))
+});
 app.use('/', async (req, res) => {
   res.status(200).send(JSON.stringify(sensorData, null, 2));
 });
@@ -24,7 +30,7 @@ app.use((err, req, res, next) => {
   console.log(JSON.stringify(err.stack));
 });
 
-app.listen(port, () => {
+app.listen(4000, () => {
   console.log(`Server started on port ${port}`);
 });
 

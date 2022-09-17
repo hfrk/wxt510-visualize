@@ -41,7 +41,7 @@ function App() {
 
   useEffect(() => {
     const id = setInterval(() => {
-      fetch(`http://localhost:2020/`)
+      fetch(`http://localhost:4000/`)
       .then((response) => response.json())
       .then((sensorData) => {
         switch(sensorData.type) {

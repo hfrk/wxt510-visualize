@@ -28,11 +28,20 @@ let num3 = numbers.map((e,i) => num2[i] + Math.random() * 3);
 let num4 = numbers.map((e,i) => num3[i] + Math.random() * 2);
 let num5 = numbers.map((e,i) => num4[i] + Math.random() * 1);
 export const Windrose = () => {
-  const [data, setData] = useState([[], [], [], [], [], []]);
+  const [data, setData] = useState({
+            calm        : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+            underFive   : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            underTwelve : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            underTwenty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            underThirty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            overThiry   : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  });
   useEffect(() => {
-    setData(data => {
-      return [numbers.map(e => 1), num1, num2, num3, num4, num5];
-    })
+    fetch(`http://localhost:4000/windrose`)
+    .then((response) => response.json())
+    .then((windData) => {
+      setData(windData);
+    });
   }, []);
 
   return (
@@ -55,41 +64,41 @@ export const Windrose = () => {
       labels: ['N', 'NNE', 'NE', 'ENE',
                'E', 'ESE', 'SE', 'SSE',
                'S', 'SSW', 'SW', 'WSW',
-               'W', 'NWN', 'NW', 'NNW'],
+               'W', 'WNW', 'NW', 'NNW'],
       datasets: [
         {
           label: 'calm',
-          data: data[0],
+          data: data.calm,
           backgroundColor: 'white',
           borderWidth: 1,
         },
         {
-          label: '1-5 km/h',
-          data: data[1],
+          label: '2-5 km/h',
+          data: data.underFive,
           backgroundColor: 'darkblue',
           borderWidth: 1,
         },
         {
-          label: '5-10 km/h',
-          data: data[2],
+          label: '5-12 km/h',
+          data: data.underTwelve,
           backgroundColor: 'blue',
           borderWidth: 1,
         },
         {
-          label: '10-20 km/h',
-          data: data[3],
+          label: '12-20 km/h',
+          data: data.underTwenty,
           backgroundColor: 'green',
           borderWidth: 1,
         },
         {
           label: '20-30 km/h',
-          data: data[4],
+          data: data.underThirty,
           backgroundColor: 'yellow',
           borderWidth: 1,
         },
         {
           label: '>30 km/h',
-          data: data[5],
+          data: data.overThirty,
           backgroundColor: 'red',
           borderWidth: 1,
         },
