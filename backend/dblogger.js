@@ -1,23 +1,8 @@
-require('dotenv').config();
-
 let mysql = require('mysql');
+const SQLConnection = require("./sql.js");
+
 const {SQLFields, SQLTables} = require("./lookup-table.js");
 const {SensorName} = require("./lookup-table.js");
-
-let con = mysql.createConnection({
-    host: process.env.SQL_HOST,
-    user: process.env.SQL_USER,
-    password: process.env.SQL_PASS,
-    database: process.env.SQL_DB
-});
-
-con.connect(function(err) {
-    if (err) {
-        console.log("Failed to connect");
-        throw err;
-    }
-    console.log("Connected to database");
-});
 
 const timestampToSQL = (timestamp) => {
     return new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ');
@@ -25,7 +10,7 @@ const timestampToSQL = (timestamp) => {
 
 const checkIfTableExist = (sensor) => {
     let sql = `CREATE TABLE IF NOT EXISTS ${sensor.id}${sensor.type} ${SQLTables[sensor.type]}`;
-    con.query(sql, function (err, result) {
+    SQLConnection.query(sql, function (err, result) {
         if (err) throw err;
     });
 }
@@ -64,6 +49,7 @@ const validateSensorData = (sensor) => {
                     sensor.data.Ua.slice(0,-1),
                     sensor.data.Pa.slice(0,-1)
                 ]]];
+            }
             break;
         case SensorName.R3:
             if (sensor.data.Rc.endsWith('M')
@@ -78,6 +64,7 @@ const validateSensorData = (sensor) => {
                     sensor.data.Ri.slice(0,-1),
                     sensor.data.Rp.slice(0,-1)
                 ]]];
+            }
             break;
         case SensorName.R5:
             if (sensor.data.Th.endsWith('C')
@@ -92,12 +79,16 @@ const validateSensorData = (sensor) => {
                     sensor.data.Vr.slice(0,-1),
                     sensor.data.Id
                 ]]];
+            }
             break;
         default:
             throw 'Data Invalid';
         }
     if (result == undefined)
         throw 'Data Invalid';
+    }
+    catch (err) {
+        throw err;
     }
     return result;
 }
@@ -107,7 +98,7 @@ const log = (sensor) => {
     let inserts = validateSensorData(sensor);
 
     let sql = mysql.format(`INSERT INTO ${sensor.id}${sensor.type} ${SQLFields[sensor.type]} VALUES ?`, inserts);
-    con.query(sql, function (err, result) {
+    SQLConnection.query(sql, function (err, result) {
         if (err) throw err;
         console.log(`Number of records inserted: ${result.affectedRows}`);
     });
