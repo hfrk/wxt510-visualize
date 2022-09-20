@@ -10,6 +10,7 @@ import { Progress } from 'antd';
 import { InfoCard, SummaryCard, ChartCard } from "./components/cards";
 import { LinePlot, BarPlot } from "./components/plots";
 import { Windrose } from "./components/windrose";
+import { WindDistribution } from "./components/wind-distribution";
 
 import compass from './compass.svg';
 
@@ -41,7 +42,7 @@ function App() {
 
   useEffect(() => {
     const id = setInterval(() => {
-      fetch(`http://localhost:4000/`)
+      fetch(`http://localhost:4000/data`)
       .then((response) => response.json())
       .then((sensorData) => {
         switch(sensorData.type) {
@@ -110,10 +111,14 @@ function App() {
   <div style={{display: "inline-flex", width: '100%'}}>
     <List
       style={{width: 360, backgroundColor: "#eeeeee", boxShadow: 'rgba(0, 0, 0, 0.5) 2.4px 2.4px 3.2px', margin: 10}}
-      header={<div>Stasiun:<h1 style={{textAlign: "right", margin: 0}}>{R5?.data?.Id || '--'}</h1></div>}
+      header={<h1>Pembacaan sensor:</h1>}
       footer={<div style={{textAlign: "right"}}>Update terakhir: {UTCtohhmmssWIB(Math.max(R1?.timestamp || 0, R2?.timestamp || 0, R3?.timestamp || 0, R5?.timestamp || 0))}</div>}
       bordered
     >
+    <List.Item>
+      <Typography.Text strong>Stasiun:</Typography.Text>
+      <h1 style={{textAlign: "right", margin: 0}}>{R5?.data?.Id || '--'}</h1>
+    </List.Item>
     <List.Item>
       <Typography.Text strong>Suhu:</Typography.Text>
       <h1 style={{textAlign: "right", margin: 0}}>{R2?.data?.Ta.slice(0,-1) || '--'} &deg;C</h1>
@@ -189,7 +194,7 @@ function App() {
         />
       </div>
       <div style={{height: 120, marginLeft: 10}}>
-        <img src={compass} alt={`compass degree ${R1?.data?.Dm?.slice(0,-1)}`} style={{width: 80, transform: `rotate(${R1?.data?.Dm?.slice(0,-1)}deg)`}} />
+        <img src={compass} alt={`compass degree ${R1?.data?.Dm?.slice(0,-1)}`} style={{width: 80, transform: `rotate(${(R1?.data?.Dm?.slice(0,-1) || 0) - 180}deg)`}} />
         <h1 style={{margin: 0}}>{R1?.data?.Dm.slice(0,-1) || '--'}&deg;</h1>
       </div>
       </Row>
@@ -222,17 +227,20 @@ function App() {
         />
       </div>
       <div style={{height: 120, marginLeft: 10}}>
-        <img src={compass} alt={`compass degree ${R1?.data?.Dm?.slice(0,-1)}`} style={{width: 80, transform: `rotate(${R1?.data?.Dm?.slice(0,-1)}deg)`}} />
+        <img src={compass} alt={`compass degree ${R1?.data?.Dm?.slice(0,-1)}`} style={{width: 80, transform: `rotate(${(R1?.data?.Dm?.slice(0,-1) || 0) - 180}deg)`}} />
         <h1 style={{margin: 0}}>{R1?.data?.Dm.slice(0,-1) || '--'}&deg;</h1>
       </div>
       </Row>
     </SummaryCard>
-        <SummaryCard>
-        <BarPlot title="Kecepatan angin (km/h)" data={data.Sm} labels={labels.R1}/>
-        </SummaryCard>
-        <SummaryCard>
-        <Windrose />
-        </SummaryCard>
+{/*    <SummaryCard>
+      <BarPlot title="Kecepatan angin (km/h)" data={data.Sm} labels={labels.R1}/>
+    </SummaryCard>
+*/}    <SummaryCard>
+    <Windrose />
+    </SummaryCard>
+    <SummaryCard>
+    <WindDistribution />
+    </SummaryCard>
   </Row>
   },
   { label: 'Suhu, Kelembapan, dan Tekanan Udara', key: 'item-r2', children: 

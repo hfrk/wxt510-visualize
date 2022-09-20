@@ -21,10 +21,14 @@ app.use('/windrose', async (req, res) => {
     let data = await Windrose.getData();
     res.status(200).send(JSON.stringify(data, null, 2))
 });
-app.use('/', async (req, res) => {
+app.use('/data', async (req, res) => {
   res.status(200).send(JSON.stringify(sensorData, null, 2));
 });
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'build')));
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 app.use((err, req, res, next) => {
   console.log(err.message);
   console.log(JSON.stringify(err.stack));
@@ -52,7 +56,7 @@ client.on('data', function(data) {
         chunks.forEach((chunk) => {
             let parsedData = DataParser.parse(chunk);
             DBLogger.log(parsedData);
-            console.log(parsedData);
+            //console.log(parsedData);
             sensorData/*[parsedData.type]*/ = parsedData;
         });
         //client.destroy(); // kill client after server's response
