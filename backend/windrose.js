@@ -53,7 +53,7 @@ WHERE
   (timestamp between '${timestampToSQL(Date.now() - 24 * 3600 * 1000)}'
                  and '${timestampToSQL(Date.now())}')
 GROUP BY direction;`;
-    console.log(sql);
+
     return new Promise((resolve, reject) => {
         let result = {
             calm        : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
@@ -61,7 +61,7 @@ GROUP BY direction;`;
             underTwelve : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             underTwenty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             underThirty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            overThiry   : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            overThirty   : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         };
 
         SQLConnection.query(sql, (err, res) => {
@@ -76,7 +76,7 @@ GROUP BY direction;`;
                     result.underTwelve[index] = row.underTwelve;
                     result.underTwenty[index] = row.underTwenty;
                     result.underThirty[index] = row.underThirty;
-                    result.overThiry[index] = row.total;
+                    result.overThirty[index] = row.total;
                 });
                 resolve(result);
             }
