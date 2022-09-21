@@ -8,7 +8,7 @@ export const InfoCard = ({children}) => {
             border: "1px solid grey",
             overflow: "hidden",
             color: 'white',
-            backgroundColor: '#4e5055',
+            backgroundColor: '#171819',
             boxShadow: 'rgba(0, 0, 0, 0.5) 2.4px 2.4px 3.2px',
             margin: 5,
             padding: 0}}>
@@ -23,7 +23,7 @@ export const SummaryCard = ({children}) => {
             width: 360,
             overflow: "hidden",
             color: 'black',
-            backgroundColor: '#F1FFEB',
+            backgroundColor: '#F1FFF1',
             boxShadow: 'rgba(0, 0, 0, 0.5) 2.4px 2.4px 3.2px',
             margin: 10,
             textAlign: "center",

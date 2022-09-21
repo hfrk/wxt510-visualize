@@ -12,7 +12,10 @@ import { LinePlot, BarPlot } from "./components/plots";
 import { Windrose } from "./components/windrose";
 import { WindDistribution } from "./components/wind-distribution";
 
-import compass from './compass.svg';
+import compass from './assets/compass.svg';
+import temp from './assets/temperature.svg';
+import humid from './assets/humidity.svg';
+import pressure from './assets/pressure.svg';
 
 const UTCtohhmmssWIB = (time) => {
     time = new Date(time + 7 * 3600 * 1000);
@@ -20,6 +23,33 @@ const UTCtohhmmssWIB = (time) => {
     const mm = String(time.getUTCMinutes()).padStart(2, '0');
     const ss = String(time.getUTCSeconds()).padStart(2, '0');
     return `${hh}:${mm}:${ss}`;
+};
+
+const WindSummaryCard = ({data}) => {
+  return (
+    <SummaryCard>
+      <h1>Angin:</h1>
+      <Row style={{display: "flex"}}>
+      <div style={{ height: 120, marginTop: 10, marginRight: 10}}>
+        <Progress
+          width={200}
+          strokeWidth={10}
+          format={(percent) => `${percent/5} km/h`}
+          strokeColor={{'0%': '#32cd32', '100%': '#ff0f0f'}}
+          type="dashboard"
+          percent={data.Sm}
+          gapDegree={180}
+          trailColor="#aaaaaa"
+        />
+      </div>
+      <div style={{height: 120, marginLeft: 10}}>
+        <img src={compass} alt={`compass degree ${data.Dm}`}
+          style={{width: 80, transform: `rotate(${(data.Dm || 0) - 180}deg)`}} />
+        <h1>{data.Dm || '--'}&deg;</h1>
+      </div>
+      </Row>
+    </SummaryCard>
+  );
 };
 
 function App() {
@@ -116,91 +146,88 @@ function App() {
       bordered
     >
     <List.Item>
-      <Typography.Text strong>Stasiun:</Typography.Text>
-      <h1 style={{textAlign: "right", margin: 0}}>{R5?.data?.Id || '--'}</h1>
+      <h2>Stasiun:</h2>
+      <h1 style={{textAlign: "right"}}>{R5?.data?.Id || '--'}</h1>
     </List.Item>
     <List.Item>
-      <Typography.Text strong>Suhu:</Typography.Text>
-      <h1 style={{textAlign: "right", margin: 0}}>{R2?.data?.Ta.slice(0,-1) || '--'} &deg;C</h1>
+      <h2>Suhu:</h2>
+      <h1 style={{textAlign: "right"}}>{R2?.data?.Ta.slice(0,-1) || '--'} &deg;C</h1>
     </List.Item>
     <List.Item>
-      <Typography.Text strong>Kelembapan:</Typography.Text>
-      <h1 style={{textAlign: "right", margin: 0}}>{R2?.data?.Ua.slice(0,-1) || '--'}%</h1>
+      <h2>Kelembapan:</h2>
+      <h1 style={{textAlign: "right",}}>{R2?.data?.Ua.slice(0,-1) || '--'}%</h1>
     </List.Item>
     <List.Item>
-      <Typography.Text strong>Tekanan udara:</Typography.Text>
-      <h1 style={{textAlign: "right", margin: 0}}>{R2?.data?.Pa.slice(0,-1) || '--'} mbar</h1>
+      <h2>Tekanan udara:</h2>
+      <h1 style={{textAlign: "right"}}>{R2?.data?.Pa.slice(0,-1) || '--'} mbar</h1>
     </List.Item>
     <List.Item>
-      <Typography.Text strong>Angin:</Typography.Text>
-      <h1 style={{textAlign: "right", margin: 0}}>{R1?.data?.Sm.slice(0,-1) || '--'} km/h,&nbsp;&nbsp;{R1?.data?.Dm.slice(0,-1) || '--'}&deg;</h1>
+      <h2>Angin:</h2>
+      <h1 style={{textAlign: "right"}}>{R1?.data?.Sm.slice(0,-1) || '--'} km/h,&nbsp;&nbsp;{R1?.data?.Dm.slice(0,-1) || '--'}&deg;</h1>
     </List.Item>
     <List.Item>
-      <Typography.Text strong>Curah Hujan (24 jam):</Typography.Text>
-      <h1 style={{textAlign: "right", margin: 0}}>{R3?.data?.Rc.slice(0,-1) || '0'} mm</h1>
+      <h2>Curah hujan:</h2>
+      <h1 style={{textAlign: "right"}}>{R3?.data?.Rc.slice(0,-1) || '0'} mm</h1>
     </List.Item>
     </List>
     <Col>
     <SummaryCard>
-      <h1 style={{margin: 0}}>Suhu:</h1>
-      <Progress
-        format={(percent) => null}
-        percent={R2?.data?.Ta.slice(0,-1)}
-        showInfo={false}
-        strokeWidth={16}
-        strokeColor="#DE172E"
-        trailColor="#aaaaaa"
-      />
-      <h1 style={{margin: 0, color: "#DE172E"}}>{R2?.data?.Ta.slice(0,-1) || '--'} &deg;C</h1>    </SummaryCard>
-    <SummaryCard>
-      <h1 style={{margin: 0}}>Kelembapan:</h1>
-      <Progress
-        format={(percent) => null}
-        percent={R2?.data?.Ua.slice(0,-1)}
-        showInfo={false}
-        strokeWidth={16}
-        strokeColor="#022B50"
-        trailColor="#aaaaaa"
-      />
-      <h1 style={{margin: 0, color: "#022B50"}}>{R2?.data?.Ua.slice(0,-1) || '--'}%</h1>
+      <div style={{display: 'inline-flex', width: "100%"}}>
+        <img src={temp} width={110}/>
+        <div style={{width: "80%"}}>
+          <h1>Suhu:</h1>
+          <Progress
+            format={(percent) => null}
+            percent={R2?.data?.Ta.slice(0,-1)}
+            showInfo={false}
+            strokeWidth={16}
+            strokeColor="#DE172E"
+            trailColor="#aaaaaa"
+          />
+          <h1 style={{color: "#DE172E"}}>{R2?.data?.Ta.slice(0,-1) || '--'} &deg;C</h1>
+        </div>
+      </div>
     </SummaryCard>
     <SummaryCard>
-      <h1 style={{margin: 0}}>Tekanan udara:</h1>
-      <Progress
-        format={(percent) => null}
-        percent={R2?.data?.Pa.slice(0,-1)/1013.5*100}
-        showInfo={false}
-        strokeWidth={16}
-        strokeColor="green"
-        trailColor="#aaaaaa"
-      />
-      <h1 style={{margin: 0, color: "green"}}>{R2?.data?.Pa.slice(0,-1) || '--'} mbar</h1>
+      <div style={{display: 'inline-flex', width: "100%"}}>
+        <img src={humid} width={110}/>
+        <div style={{width: "80%"}}>
+          <h1>Kelembapan:</h1>
+          <Progress
+            format={(percent) => null}
+            percent={R2?.data?.Ua.slice(0,-1)}
+            showInfo={false}
+            strokeWidth={16}
+            strokeColor="#022B50"
+            trailColor="#aaaaaa"
+          />
+          <h1 style={{color: "#022B50"}}>{R2?.data?.Ua.slice(0,-1) || '--'}%</h1>
+        </div>
+      </div>
+    </SummaryCard>
+    <SummaryCard>
+      <div style={{display: 'inline-flex', width: "100%"}}>
+        <img src={pressure} width={110}/>
+        <div style={{width: "80%"}}>
+          <h1>Tekanan udara:</h1>
+          <Progress
+            format={(percent) => null}
+            percent={R2?.data?.Pa.slice(0,-1)/1013.5*100}
+            showInfo={false}
+            strokeWidth={16}
+            strokeColor="green"
+            trailColor="#aaaaaa"
+          />
+          <h1 style={{color: "green"}}>{R2?.data?.Pa.slice(0,-1) || '--'} mbar</h1>
+        </div>
+      </div>
     </SummaryCard>
     </Col>
     <Col>
+    <WindSummaryCard data={{Sm: R1?.data?.Sm.slice(0,-1),
+                            Dm: R1?.data?.Dm.slice(0,-1)}}/>
     <SummaryCard>
-      <h1 style={{margin: 0}}>Angin:</h1>
-      <Row style={{display: "flex"}}>
-      <div style={{height: 120, marginTop: 10, marginRight: 10}}>
-        <Progress
-          width={200}
-          strokeWidth={10}
-          format={(percent) => `${percent/5} km/h`}
-          strokeColor={{'0%': '#32cd32', '100%': '#ff0f0f'}}
-          type="dashboard"
-          percent={R1?.data?.Sm.slice(0,-1)*5}
-          gapDegree={180}
-          trailColor="#aaaaaa"
-        />
-      </div>
-      <div style={{height: 120, marginLeft: 10}}>
-        <img src={compass} alt={`compass degree ${R1?.data?.Dm?.slice(0,-1)}`} style={{width: 80, transform: `rotate(${(R1?.data?.Dm?.slice(0,-1) || 0) - 180}deg)`}} />
-        <h1 style={{margin: 0}}>{R1?.data?.Dm.slice(0,-1) || '--'}&deg;</h1>
-      </div>
-      </Row>
-    </SummaryCard>
-    <SummaryCard>
-      <h1 style={{margin: 0}}>Curah Hujan (24 jam): <br></br>{R3?.data?.Rc.slice(0,-1) || '0'} mm</h1>
+      <h1>Curah Hujan (24 jam): <br></br>{R3?.data?.Rc.slice(0,-1) || '0'} mm</h1>
       <BarPlot title="Curah Hujan (24 jam):" data={[0,0,1,2,3,3,3.5,3,2,2,1,0,0,0,1,0,0,0,0,0]} labels={["19:00","20:00","21:00","22:00","23:00","00:00",
                                                                                                         "01:00","02:00","03:00","04:00","05:00","06:00",
                                                                                                         "07:00","08:00","09:00","10:00","11:00","12:00",
@@ -211,48 +238,30 @@ function App() {
   },
   { label: 'Angin', key: 'item-r1', children: 
   <Row style={{ width: '100%', display: "inline-flex" }}>
-    <SummaryCard>
-      <h1 style={{margin: 0}}>Angin:</h1>
-      <Row style={{display: "flex"}}>
-      <div style={{ height: 120, marginTop: 10, marginRight: 10}}>
-        <Progress
-          width={200}
-          strokeWidth={10}
-          format={(percent) => `${percent/5} km/h`}
-          strokeColor={{'0%': '#32cd32', '100%': '#ff0f0f'}}
-          type="dashboard"
-          percent={R1?.data?.Sm.slice(0,-1)*5}
-          gapDegree={180}
-          trailColor="#aaaaaa"
-        />
-      </div>
-      <div style={{height: 120, marginLeft: 10}}>
-        <img src={compass} alt={`compass degree ${R1?.data?.Dm?.slice(0,-1)}`} style={{width: 80, transform: `rotate(${(R1?.data?.Dm?.slice(0,-1) || 0) - 180}deg)`}} />
-        <h1 style={{margin: 0}}>{R1?.data?.Dm.slice(0,-1) || '--'}&deg;</h1>
-      </div>
-      </Row>
-    </SummaryCard>
+    <WindSummaryCard data={{Sm: R1?.data?.Sm.slice(0,-1),
+                            Dm: R1?.data?.Dm.slice(0,-1)}}/>
 {/*    <SummaryCard>
       <BarPlot title="Kecepatan angin (km/h)" data={data.Sm} labels={labels.R1}/>
     </SummaryCard>
-*/}    <SummaryCard>
-    <Windrose />
+*/}    
+    <SummaryCard>
+      <Windrose />
     </SummaryCard>
     <SummaryCard>
-    <WindDistribution />
+      <WindDistribution />
     </SummaryCard>
   </Row>
   },
   { label: 'Suhu, Kelembapan, dan Tekanan Udara', key: 'item-r2', children: 
   <Row style={{ width: '100%', display: "inline-flex" }}>
         <ChartCard>
-        <LinePlot title="Suhu (Celsius)" data={data.Ta} labels={labels.R2}/>
+          <LinePlot title="Suhu (Celsius)" data={data.Ta} labels={labels.R2}/>
         </ChartCard>
         <ChartCard>
-        <LinePlot title="Kelembapan (%RH)" data={data.Ua} labels={labels.R2}/>
+          <LinePlot title="Kelembapan (%RH)" data={data.Ua} labels={labels.R2}/>
         </ChartCard>
         <ChartCard>
-        <LinePlot title="Tekanan udara (hPa)" data={data.Pa} labels={labels.R2}/>
+          <LinePlot title="Tekanan udara (hPa)" data={data.Pa} labels={labels.R2}/>
         </ChartCard>
   </Row>
   },
