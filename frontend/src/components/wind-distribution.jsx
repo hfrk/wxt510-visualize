@@ -21,19 +21,24 @@ const sumArray = (arr) => {
 export const WindDistribution = () => {
   const [total, setTotal] = useState([0, 0, 0, 0, 0, 0]);
   useEffect(() => {
-    fetch(`http://localhost:4000/windrose`)
-    .then((response) => response.json())
-    .then((windData) => {
-      setTotal(total => {
-        total[0] = sumArray(windData.calm); // calm
-        total[1] = sumArray(windData.underFive) - sumArray(windData.calm); // 2-5
-        total[2] = sumArray(windData.underTwelve) - sumArray(windData.underFive); // 5-12
-        total[3] = sumArray(windData.underTwenty) - sumArray(windData.underTwelve); // 12-20
-        total[4] = sumArray(windData.underThirty) - sumArray(windData.underTwenty); // 20-30
-        total[5] = sumArray(windData.overThiry) - sumArray(windData.underThirty); // >30
-        return total;
+    const dataFetcher = () => {
+      fetch(`http://localhost:4000/windrose`)
+      .then((response) => response.json())
+      .then((windData) => {
+        setTotal(total => {
+          total[0] = sumArray(windData.calm); // calm
+          total[1] = sumArray(windData.underFive) - sumArray(windData.calm); // 2-5
+          total[2] = sumArray(windData.underTwelve) - sumArray(windData.underFive); // 5-12
+          total[3] = sumArray(windData.underTwenty) - sumArray(windData.underTwelve); // 12-20
+          total[4] = sumArray(windData.underThirty) - sumArray(windData.underTwenty); // 20-30
+          total[5] = sumArray(windData.overThiry) - sumArray(windData.underThirty); // >30
+          return total;
+        });
       });
-    });
+    };
+    dataFetcher();
+    const id = setInterval(dataFetcher, 10 * 60 * 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
@@ -46,7 +51,7 @@ export const WindDistribution = () => {
         },
         legend: {
           display: true,
-          position: 'bottom'
+          position: 'left'
         },
       },
       responsive: true,
@@ -56,7 +61,7 @@ export const WindDistribution = () => {
       datasets: [
         {
           data: total,
-          backgroundColor: ['black', 'darkblue', 'blue', 'green', 'yellow', 'red'],
+          backgroundColor: ['#171819', '#012CFF', '#00D5F7', '#7CFD7F', '#FDE801', '#FF4503'],
         },
       ],
     }} />

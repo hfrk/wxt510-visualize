@@ -5,7 +5,7 @@ import {
   ArcElement,
   Title,
 } from 'chart.js';
-import { PolarArea, Pie } from 'react-chartjs-2';
+import { PolarArea } from 'react-chartjs-2';
 import { useState, useEffect } from "react";
 
 ChartJS.register(
@@ -16,7 +16,8 @@ ChartJS.register(
 );
 
 const duplicateAndShift = (arr) => {
-  arr = arr.flatMap(x => [x,x]);
+  if (arr === undefined || arr === null) return;
+  arr = arr.flatMap(x => [x,x,null]);
   arr.push(arr.shift());
   return arr;
 };
@@ -28,27 +29,60 @@ export const Windrose = () => {
     underTwelve : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     underTwenty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     underThirty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    overThirty   : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    overThirty  : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   });
 
   useEffect(() => {
-    fetch(`http://localhost:4000/windrose`)
-    .then((response) => response.json())
-    .then((windData) => {
-      console.log(windData);
-      setData(data => {
-        Object.entries(windData).forEach(([key, value]) => {
-          data[key] = duplicateAndShift(value);
+    const dataFetcher = () => {
+      fetch(`http://localhost:4000/windrose`)
+      .then((response) => response.json())
+      .then((windData) => {
+        console.log(windData);
+        setData(data => {
+          let max = windData.overThirty.reduce((previousSum, a) => previousSum + a, 0);
+          Object.entries(windData).forEach(([key, value]) => {
+            data[key] = duplicateAndShift(value.map(x => x/max * 100));
+          });
+          return data;
         });
-        return data;
+      })
+      .catch((err) => {
+        console.log(err.message);
       });
-    });
+    };
+    dataFetcher();
+    const id = setInterval(dataFetcher, 10 * 60 * 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
     <PolarArea
     options={{
       responsive: true,
+      scales: {
+        r: {
+          ticks: {
+            callback: (value, index, ticks) => `${value}%`,
+          },
+          angleLines: {
+            display: false,
+            lineWidth: 2,
+            color: "red",
+          },
+          grid: {
+            display: true,
+            lineWidth: 2,
+          },
+          pointLabels: {
+            display: true,
+            callback: (value, index, ticks) => index % 3 ? null : value,
+            centerPointLabels: false,
+            font: {
+              size: 18
+            }
+          }
+        },
+      },
       plugins: {
         legend: {
           display: false,
@@ -58,7 +92,7 @@ export const Windrose = () => {
           text: "Wind rose (24 jam)"
         },
         tooltip: {
-          enabled: false,
+          enabled: true,
         }
       },
       animation: {
@@ -76,37 +110,37 @@ export const Windrose = () => {
         {
           label: 'calm',
           data: data.calm,
-          backgroundColor: 'black',
+          backgroundColor: '#171819',
           borderWidth: 0,
         },
         {
           label: '2-5 km/h',
           data: data.underFive,
-          backgroundColor: 'darkblue',
+          backgroundColor: '#012CFF',
           borderWidth: 0,
         },
         {
           label: '5-12 km/h',
           data: data.underTwelve,
-          backgroundColor: 'blue',
+          backgroundColor: '#00D5F7',
           borderWidth: 0,
         },
         {
           label: '12-20 km/h',
           data: data.underTwenty,
-          backgroundColor: 'green',
+          backgroundColor: '#7CFD7F',
           borderWidth: 0,
         },
         {
           label: '20-30 km/h',
           data: data.underThirty,
-          backgroundColor: 'yellow',
+          backgroundColor: '#FDE801',
           borderWidth: 0,
         },
         {
           label: '>30 km/h',
           data: data.overThirty,
-          backgroundColor: 'red',
+          backgroundColor: '#FF4503',
           borderWidth: 0,
         },
       ],
