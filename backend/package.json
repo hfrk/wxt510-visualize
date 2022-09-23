@@ -1,9 +1,22 @@
 {
+  "name": "Stasiun BBD",
+  "version": "1.0.0",
+  "description": "Visualisasi data sensor cuaca pada stasiun BBD",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/hfrk/wxt510-visualize",
+  "author": "Hafidh RK",
+  "license": "CC0-1.0",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "mysql": "^2.18.1",
     "net": "^1.0.2"
+  },
+  "devDependencies": {
+    "electron": "^20.1.4"
   }
 }

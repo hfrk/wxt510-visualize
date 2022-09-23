@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Visualisasi Vaisala WXT510",
+  "name": "Visualisasi data sensor cuaca pada stasiun BBD",
   "icons": [
     {
       "src": "favicon.ico",
