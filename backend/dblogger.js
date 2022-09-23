@@ -20,12 +20,12 @@ const validateSensorData = (sensor) => {
     try {
         switch(sensor.name) {
         case SensorName.R1:
-            if (sensor.data.Dn.endsWith('D')
-             && sensor.data.Dm.endsWith('D')
-             && sensor.data.Dx.endsWith('D')
-             && sensor.data.Sn.endsWith('K')
-             && sensor.data.Sm.endsWith('K')
-             && sensor.data.Sx.endsWith('K')
+            if (sensor?.data?.Dn?.endsWith('D')
+             && sensor?.data?.Dm?.endsWith('D')
+             && sensor?.data?.Dx?.endsWith('D')
+             && sensor?.data?.Sn?.endsWith('K')
+             && sensor?.data?.Sm?.endsWith('K')
+             && sensor?.data?.Sx?.endsWith('K')
              ) {
                 result = [[[
                     timestampToSQL(sensor.timestamp),
@@ -39,9 +39,9 @@ const validateSensorData = (sensor) => {
             }
             break;
         case SensorName.R2:
-            if (sensor.data.Ta.endsWith('C')
-             && sensor.data.Ua.endsWith('P')
-             && sensor.data.Pa.endsWith('H')
+            if (sensor?.data?.Ta?.endsWith('C')
+             && sensor?.data?.Ua?.endsWith('P')
+             && sensor?.data?.Pa?.endsWith('H')
              ) {
                 result = [[[
                     timestampToSQL(sensor.timestamp),
@@ -52,10 +52,10 @@ const validateSensorData = (sensor) => {
             }
             break;
         case SensorName.R3:
-            if (sensor.data.Rc.endsWith('M')
-             && sensor.data.Rd.endsWith('s')
-             && sensor.data.Ri.endsWith('M')
-             && sensor.data.Rp.endsWith('M')
+            if (sensor?.data?.Rc?.endsWith('M')
+             && sensor?.data?.Rd?.endsWith('s')
+             && sensor?.data?.Ri?.endsWith('M')
+             && sensor?.data?.Rp?.endsWith('M')
              ) {
                 result = [[[
                     timestampToSQL(sensor.timestamp),
@@ -67,9 +67,9 @@ const validateSensorData = (sensor) => {
             }
             break;
         case SensorName.R5:
-            if (sensor.data.Th.endsWith('C')
-             && sensor.data.Vs.endsWith('V')
-             && sensor.data.Vr.endsWith('V')
+            if (sensor?.data?.Th?.endsWith('C')
+             && sensor?.data?.Vs?.endsWith('V')
+             && sensor?.data?.Vr?.endsWith('V')
              ) {
                 result = [[[
                     timestampToSQL(sensor.timestamp),
@@ -105,3 +105,4 @@ const log = (sensor) => {
 }
 
 module.exports.log = log;
+module.exports.checkIfTableExist = checkIfTableExist;

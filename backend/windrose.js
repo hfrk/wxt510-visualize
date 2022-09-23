@@ -1,4 +1,8 @@
+/* return 16-direction windrose data of the last 24 hours */
+require('dotenv').config();
 const SQLConnection = require("./sql.js");
+const { checkIfTableExist } = require("./dblogger.js");
+const sensor_id = process.env.SENSOR_ID;
 
 const DirectionIndex = {
     N   : 0,
@@ -17,10 +21,6 @@ const DirectionIndex = {
     WNW : 13,
     NW  : 14,
     NNW : 15
-};
-
-const timestampToSQL = (timestamp) => {
-    return new Date(timestamp).toISOString().slice(0, 19).replace('T', ' ');
 };
 
 const getData = () => {
@@ -48,10 +48,10 @@ const getData = () => {
        sum(case when Sm <= 20.0 then 1 else 0 end) AS underTwenty,
        sum(case when Sm <= 30.0 then 1 else 0 end) AS underThirty,
        count(Sm) AS total
-FROM 1R1
+FROM ${sensor_id}R1
 WHERE
-  (timestamp between '${timestampToSQL(Date.now() - 24 * 3600 * 1000)}'
-                 and '${timestampToSQL(Date.now())}')
+  (timestamp between UTC_TIMESTAMP() - INTERVAL 24 HOUR
+                 and UTC_TIMESTAMP())
 GROUP BY direction;`;
 
     return new Promise((resolve, reject) => {
@@ -61,9 +61,10 @@ GROUP BY direction;`;
             underTwelve : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             underTwenty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             underThirty : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            overThirty   : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            overThirty  : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         };
-
+        
+        checkIfTableExist({id: sensor_id, type: "R1"});
         SQLConnection.query(sql, (err, res) => {
             if (err || res === undefined)
                 reject(err);
