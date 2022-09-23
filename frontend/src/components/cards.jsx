@@ -36,7 +36,8 @@ export const SummaryCard = ({children}) => {
 export const ChartCard = ({children}) => {
     return (
         <Card style={{
-            width: 960,
+            width: "100%",
+            maxWidth: 560,
             border: "1px solid grey",
             overflow: "hidden",
             backgroundColor: 'white',

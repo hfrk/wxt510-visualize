@@ -4,13 +4,14 @@ import 'antd/es/list/style/index.css';
 import 'antd/es/progress/style/index.css';
 
 import { useState, useEffect } from "react";
-import { Row, Col, Tabs, List, Typography } from "antd";
+import { Row, Col, Tabs, List } from "antd";
 import { Progress } from 'antd';
 
 import { InfoCard, SummaryCard, ChartCard } from "./components/cards";
 import { LinePlot, BarPlot } from "./components/plots";
 import { Windrose } from "./components/windrose";
 import { WindDistribution } from "./components/wind-distribution";
+import { RainSummary } from "./components/rain";
 
 import compass from './assets/compass.svg';
 import temp from './assets/temperature.svg';
@@ -18,6 +19,8 @@ import humid from './assets/humidity.svg';
 import pressure from './assets/pressure.svg';
 
 const UTCtohhmmssWIB = (time) => {
+    if (isNaN(time))
+      return
     time = new Date(time + 7 * 3600 * 1000);
     const hh = String(time.getUTCHours()).padStart(2, '0');
     const mm = String(time.getUTCMinutes()).padStart(2, '0');
@@ -37,7 +40,7 @@ const WindSummaryCard = ({data}) => {
           format={(percent) => `${percent/5} km/h`}
           strokeColor={{'0%': '#32cd32', '100%': '#ff0f0f'}}
           type="dashboard"
-          percent={data.Sm}
+          percent={data.Sm*5}
           gapDegree={180}
           trailColor="#aaaaaa"
         />
@@ -142,7 +145,7 @@ function App() {
     <List
       style={{width: 360, backgroundColor: "#eeeeee", boxShadow: 'rgba(0, 0, 0, 0.5) 2.4px 2.4px 3.2px', margin: 10}}
       header={<h1>Pembacaan sensor:</h1>}
-      footer={<div style={{textAlign: "right"}}>Update terakhir: {UTCtohhmmssWIB(Math.max(R1?.timestamp || 0, R2?.timestamp || 0, R3?.timestamp || 0, R5?.timestamp || 0))}</div>}
+      footer={<div style={{textAlign: "right"}}>Update terakhir: {UTCtohhmmssWIB(Math.max(R1?.timestamp || 0, R2?.timestamp || 0, R3?.timestamp || 0, R5?.timestamp || 0)) || 'no data'}</div>}
       bordered
     >
     <List.Item>
@@ -173,7 +176,7 @@ function App() {
     <Col>
     <SummaryCard>
       <div style={{display: 'inline-flex', width: "100%"}}>
-        <img src={temp} width={110}/>
+        <img src={temp} alt="temperature icon" width={110}/>
         <div style={{width: "80%"}}>
           <h1>Suhu:</h1>
           <Progress
@@ -190,7 +193,7 @@ function App() {
     </SummaryCard>
     <SummaryCard>
       <div style={{display: 'inline-flex', width: "100%"}}>
-        <img src={humid} width={110}/>
+        <img src={humid} alt="humidity icon" width={110}/>
         <div style={{width: "80%"}}>
           <h1>Kelembapan:</h1>
           <Progress
@@ -207,7 +210,7 @@ function App() {
     </SummaryCard>
     <SummaryCard>
       <div style={{display: 'inline-flex', width: "100%"}}>
-        <img src={pressure} width={110}/>
+        <img src={pressure} alt="pressure icon" width={110}/>
         <div style={{width: "80%"}}>
           <h1>Tekanan udara:</h1>
           <Progress
@@ -226,30 +229,18 @@ function App() {
     <Col>
     <WindSummaryCard data={{Sm: R1?.data?.Sm.slice(0,-1),
                             Dm: R1?.data?.Dm.slice(0,-1)}}/>
-    <SummaryCard>
-      <h1>Curah Hujan (24 jam): <br></br>{R3?.data?.Rc.slice(0,-1) || '0'} mm</h1>
-      <BarPlot title="Curah Hujan (24 jam):" data={[0,0,1,2,3,3,3.5,3,2,2,1,0,0,0,1,0,0,0,0,0]} labels={["19:00","20:00","21:00","22:00","23:00","00:00",
-                                                                                                        "01:00","02:00","03:00","04:00","05:00","06:00",
-                                                                                                        "07:00","08:00","09:00","10:00","11:00","12:00",
-                                                                                                        "13:00","14:00","15:00","16:00","17:00","18:00"]}/>
-    </SummaryCard>
+    <RainSummary type="short"/>
     </Col>
   </div>
   },
   { label: 'Angin', key: 'item-r1', children: 
   <Row style={{ width: '100%', display: "inline-flex" }}>
-    <WindSummaryCard data={{Sm: R1?.data?.Sm.slice(0,-1),
-                            Dm: R1?.data?.Dm.slice(0,-1)}}/>
-{/*    <SummaryCard>
-      <BarPlot title="Kecepatan angin (km/h)" data={data.Sm} labels={labels.R1}/>
-    </SummaryCard>
-*/}    
-    <SummaryCard>
+    <ChartCard>
       <Windrose />
-    </SummaryCard>
-    <SummaryCard>
+    </ChartCard>
+    <ChartCard>
       <WindDistribution />
-    </SummaryCard>
+    </ChartCard>
   </Row>
   },
   { label: 'Suhu, Kelembapan, dan Tekanan Udara', key: 'item-r2', children: 
@@ -266,20 +257,22 @@ function App() {
   </Row>
   },
   { label: 'Curah Hujan', key: 'item-r3', children: 
-  <Row></Row>
+  <Row style={{ width: '100%', display: "inline-flex" }}>
+    <RainSummary type="full" />
+  </Row>
   },
   { label: 'Raw Data', key: 'item-raw', children: 
   <Row style={{ width: '100%', display: "inline-flex" }}>
     <InfoCard>
       <p> Anemometer: </p>
       <ul>
-        <li>Kecepatan angin minimum:   {R1?.data?.Sn || ''}</li>
-        <li>Kecepatan angin rata-rata: {R1?.data?.Sm || ''}</li>
-        <li>Kecepatan angin maksimum:  {R1?.data?.Sx || ''}</li>
-        <li>Arah angin minimum:        {R1?.data?.Dn || ''}</li>
-        <li>Arah angin rata-rata:      {R1?.data?.Dm || ''}</li>
-        <li>Arah angin maksimum:       {R1?.data?.Dx || ''}</li>
-        <li>Update terakhir:           {R1 ? UTCtohhmmssWIB(R1.timestamp) : "no data"}</li>
+        <li>Kecepatan minimum:   {R1?.data?.Sn || ''}</li>
+        <li>Kecepatan rata-rata: {R1?.data?.Sm || ''}</li>
+        <li>Kecepatan maksimum:  {R1?.data?.Sx || ''}</li>
+        <li>Arah minimum:        {R1?.data?.Dn || ''}</li>
+        <li>Arah rata-rata:      {R1?.data?.Dm || ''}</li>
+        <li>Arah maksimum:       {R1?.data?.Dx || ''}</li>
+        <li>Update terakhir:     {R1 ? UTCtohhmmssWIB(R1.timestamp) : "no data"}</li>
       </ul>
     </InfoCard>
     <InfoCard>
@@ -294,15 +287,15 @@ function App() {
     <InfoCard>
       <p> Curah Hujan: </p>
       <ul>
-        <li>Akumulasi hujan:             {R3?.data?.Rc || ''}</li>
-        <li>Durasi hujan:                {R3?.data?.Rd || ''}</li>
-        <li>Intensitas hujan:            {R3?.data?.Ri || ''}</li>
-        <li>Intensitas hujan (maksimum): {R3?.data?.Rp || ''}</li>
-        <li>Akumulasi hail:              {R3?.data?.Hc || ''}</li>
-        <li>Durasi hail:                 {R3?.data?.Hd || ''}</li>
-        <li>Intensitas hail:             {R3?.data?.Hi || ''}</li>
-        <li>Intensitas hail (maksimum):  {R3?.data?.Hp || ''}</li>
-        <li>Update terakhir:             {R3 ? UTCtohhmmssWIB(R3.timestamp) : "no data"}</li>
+        <li>Akumulasi hujan:          {R3?.data?.Rc || ''}</li>
+        <li>Durasi hujan:             {R3?.data?.Rd || ''}</li>
+        <li>Intensitas hujan:         {R3?.data?.Ri || ''}</li>
+        <li>Intensitas hujan (maks.): {R3?.data?.Rp || ''}</li>
+        <li>Akumulasi hail:           {R3?.data?.Hc || ''}</li>
+        <li>Durasi hail:              {R3?.data?.Hd || ''}</li>
+        <li>Intensitas hail:          {R3?.data?.Hi || ''}</li>
+        <li>Intensitas hail (maks.):  {R3?.data?.Hp || ''}</li>
+        <li>Update terakhir:          {R3 ? UTCtohhmmssWIB(R3.timestamp) : "no data"}</li>
       </ul>
     </InfoCard>
     <InfoCard>
