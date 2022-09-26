@@ -100,7 +100,7 @@ const log = (sensor) => {
     let sql = mysql.format(`INSERT INTO ${sensor.id}${sensor.type} ${SQLFields[sensor.type]} VALUES ?`, inserts);
     SQLConnection.query(sql, function (err, result) {
         if (err) throw err;
-        console.log(`Number of records inserted: ${result.affectedRows}`);
+        //console.log(`Number of records inserted: ${result.affectedRows}`);
     });
 }
 

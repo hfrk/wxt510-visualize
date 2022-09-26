@@ -1,7 +1,9 @@
 require('dotenv').config();
+const path = require('path');
 
 const { BrowserWindow, app } = require('electron');
 const { powerSaveBlocker } = require('electron');
+const { powerMonitor } = require('electron');
 const server = require('./app.js');
 
 const serverPort = 4000;
@@ -23,3 +25,15 @@ function createWindow() {
 }
 
 app.on("ready", createWindow);
+app.setAppLogsPath(path.join(__dirname, 'app.log'));
+process.on("uncaughtException", (err, origin) => {
+  console.log(`Caught exception: ${err}\n` +
+              `Exception origin: ${origin}`
+              );
+  app.relaunch();
+  app.quit();
+});
+powerMonitor.on('resume', () => {
+  console.log('The system is resuming');
+  mainWindow.reload();
+});

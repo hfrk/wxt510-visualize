@@ -16,11 +16,11 @@ app.use(cors());
 
 app.use('/windrose', async (req, res) => {
     let data = await Windrose.getData();
-    res.status(200).send(JSON.stringify(data, null, 2))
+    res.status(200).send(JSON.stringify(data, null, 2));
 });
 app.use('/rain', async (req, res) => {
     let data = await Rain.getData();
-    res.status(200).send(JSON.stringify(data, null, 2))
+    res.status(200).send(JSON.stringify(data, null, 2));
 });
 app.use('/data', async (req, res) => {
     let data = DataListener.getData();
