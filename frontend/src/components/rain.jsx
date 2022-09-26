@@ -6,7 +6,6 @@ import {
   Title,
   Tooltip,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
 import { BarPlot } from "./plots";
 import { SummaryCard, ChartCard } from "./cards";
 import { useState, useEffect } from "react";

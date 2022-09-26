@@ -37,7 +37,7 @@ export const Windrose = () => {
       fetch(`http://localhost:4000/windrose`)
       .then((response) => response.json())
       .then((windData) => {
-        console.log(windData);
+        //console.log(windData);
         setData(data => {
           let max = windData.overThirty.reduce((previousSum, a) => previousSum + a, 0);
           Object.entries(windData).forEach(([key, value]) => {

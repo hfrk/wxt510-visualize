@@ -61,13 +61,9 @@ function App() {
   const [R3, setR3] = useState(null);
   const [R5, setR5] = useState(null);
   const [labels, setLabels] = useState({
-    R1: [],
     R2: []
   });
   const [data, setData] = useState({
-    Sn: [],
-    Sm: [],
-    Sx: [],
     Ta: [],
     Ua: [],
     Pa: [],
@@ -81,41 +77,23 @@ function App() {
         switch(sensorData.type) {
           case "R1":
             setR1(sensorData);
-            if (labels.R1[-1] === UTCtohhmmssWIB(sensorData.timestamp))
-              break;
-            setLabels(labels => {
-              return {
-                R1: [...labels.R1, UTCtohhmmssWIB(sensorData.timestamp)].slice(-40),
-                R2: [...labels.R2]
-              }
-            });
-            setData(data => {
-              return {
-              ...data,
-              Sn: [...data.Sn, Number(sensorData.data.Sn.slice(0,-1))].slice(-40),
-              Sm: [...data.Sm, Number(sensorData.data.Sm.slice(0,-1))].slice(-40),
-              Sx: [...data.Sx, Number(sensorData.data.Sx.slice(0,-1))].slice(-40),
-              }
-            });
             break;
           case "R2":
             setR2(sensorData);
             if (labels.R2.slice(-1)[0] === UTCtohhmmssWIB(sensorData.timestamp)) {
-              console.log("same data");
-              console.log(sensorData.timestamp, labels.R2.slice(-1)[0]);
               break;
             }
             setLabels(labels => {
               return {
-                R1: [...labels.R1],
                 R2: [...labels.R2, UTCtohhmmssWIB(sensorData.timestamp)].slice(-150)
-              }
+              };
             });
             setData(data => {
-              data.Ta.push(Number(sensorData.data.Ta.slice(0,-1)));
-              data.Ua.push(Number(sensorData.data.Ua.slice(0,-1)));
-              data.Pa.push(Number(sensorData.data.Pa.slice(0,-1)));
-              return data;
+              return {
+                Ta: [...data.Ta, Number(sensorData.data.Ta.slice(0,-1))].slice(-150),
+                Ua: [...data.Ua, Number(sensorData.data.Ua.slice(0,-1))].slice(-150),
+                Pa: [...data.Pa, Number(sensorData.data.Pa.slice(0,-1))].slice(-150),
+              };
             });
             break;
           case "R3":
