@@ -38,7 +38,6 @@ client.on('connect', () => {
 });
 
 client.on('data', function(data) {
-    //console.log(data, data.length);
     buffer += String(data);
     if (buffer.includes("\r\n")) {
         let chunks = buffer.split("\r\n");
@@ -46,10 +45,8 @@ client.on('data', function(data) {
         chunks.forEach((chunk) => {
             let parsedData = DataParser.parse(chunk);
             DBLogger.log(parsedData);
-            //console.log(parsedData);
-            sensorData/*[parsedData.type]*/ = parsedData;
+            sensorData = parsedData;
         });
-        //client.destroy(); // kill client after server's response
     }
 });
 
